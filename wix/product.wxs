@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="no360" Language="1033" Version="1.0.0" Manufacturer="Zzzztj Software"
+           UpgradeCode="{6F1AA2AA-0C0F-49F9-8B37-5E7D3A9A6F23}">
+   <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+
+   <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- Upgrade story: new major/minor version upgrades old -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of no360 is already installed." />
+
+    <Feature Id="MainFeature" Title="no360" Level="1" Absent="disallow">
+      <ComponentRef Id="cmpNo360Exe"/>
+      <ComponentRef Id="cmpDeps"/>
+      <ComponentRef Id="cmpRuntimeConfig"/>
+      <ComponentRef Id="cmpAppSettings"/>
+      <ComponentRef Id="cmpProgramDataQuarantine"/>
+      <ComponentRef Id="cmpEventLogSource"/>
+    </Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <UIRef Id="WixUI_InstallDir"/>
+    <UIRef Id="WixUI_ErrorProgressText"/>
+    
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectRoot)\wix\license.rtf" />
+
+
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="no360">
+
+          <!-- Service EXE + service registration -->
+          <Component Id="cmpNo360Exe" Guid="{9FD4CAAB-7406-4E2D-9A6F-3B55C67C4B73}" Win64="yes">
+            <File Id="filExe" Source="$(var.PublishDir)\no360.exe" KeyPath="yes"/>
+            <ServiceInstall Id="svcNo360"
+                            Name="no360"
+                            DisplayName="no360"
+                            Description="Blocks installation of disallowed software by signature/metadata."
+                            Start="auto"
+                            Type="ownProcess"
+                            ErrorControl="normal"
+                            Vital="yes" />
+            <ServiceControl Id="svcControlNo360"
+                            Name="no360"
+                            Start="install"
+                            Stop="both"
+                            Remove="uninstall"
+                            Wait="yes"/>
+          </Component>
+
+          <!-- The usual .NET publish sidecars -->
+          <Component Id="cmpDeps" Guid="{2892C76D-EE53-4B3D-9AB6-4A0C7F753D9A}" Win64="yes">
+            <File Id="filDeps" Source="$(var.PublishDir)\no360.deps.json" KeyPath="yes"/>
+          </Component>
+
+          <Component Id="cmpRuntimeConfig" Guid="{2B4F7DF8-1C9C-4DFF-9D1B-5B1DA9B3A4B1}" Win64="yes">
+            <File Id="filRuntimeConfig" Source="$(var.PublishDir)\no360.runtimeconfig.json" KeyPath="yes"/>
+          </Component>
+
+          <Component Id="cmpAppSettings" Guid="{B33B9E3A-86B9-4B24-9E3E-5E57C7A1D5B2}" Win64="yes">
+            <File Id="filAppSettings" Source="$(var.PublishDir)\appsettings.json" KeyPath="yes"/>
+          </Component>
+
+        </Directory>
+      </Directory>
+
+      <!-- ProgramData\no360\Quarantine -->
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="RefereeData" Name="no360">
+          <Directory Id="QuarantineDir" Name="Quarantine">
+            <Component Id="cmpProgramDataQuarantine" Guid="{5F3C7C13-2DF2-4B2E-B1A2-7F4A9967E9A1}" Win64="yes">
+              <CreateFolder />
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- Event Log source (lets the service write to Application log cleanly) -->
+    <Component Id="cmpEventLogSource" Guid="{A3F0E1A1-6A8F-4A12-9E30-9A2B8E4F7F11}" Directory="INSTALLFOLDER" Win64="yes">
+      <RegistryKey Root="HKLM"
+                   Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\no360">
+        <RegistryValue Type="string" Name="EventMessageFile"
+                       Value="%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\EventLogMessages.dll" KeyPath="yes"/>
+        <RegistryValue Type="integer" Name="TypesSupported" Value="7"/>
+      </RegistryKey>
+    </Component>
+
+  </Product>
+</Wix>

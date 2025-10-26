@@ -1,0 +1,130 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+[xX]64/
+[xX]86/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Ll]og/
+**/[Bb]in/
+**/[Oo]bj/
+
+# Visual Studio user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code settings
+.vscode/
+
+# Rider settings
+.idea/
+*.sln.iml
+
+# MonoDevelop
+*.userprefs
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Visual Studio cache files
+*.cache
+*.[Cc]ache
+
+# Others
+*.dbmdl
+*.bak
+*.backup
+*.log
+*.nupkg
+*.orig
+*.tmp
+*.temp
+~*
+
+# Azure
+.terraform/
+
+# NuGet
+packages/
+*.snupkg
+*.symbols.nupkg
+.project.nuget.cache
+nuget.config
+.nuget/
+
+# Dotnet CLI
+artifacts/
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# DotCover
+*.dotCover
+
+# User-specific files
+*.rsuser
+*.sln.docstates
+
+# IIS Express
+*.vs/
+
+# StyleCop
+StyleCop.Cache
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.iobj
+*.ipdb
+*.iuser
+*.pdb
+
+# Others
+[Tt]humbs.db
+[Dd]esktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows image file caches
+ehthumbs.db
+
+# dotnet tools
+.dotnet-tools
+
+# Rider project files
+.idea/
+*.sln.iml
+
+# Visual Studio generated files
+.vs/
+
+# Coverage results
+coverage*
+*.coverage
+*.coveragexml
+
+# Publish outputs
+publish/
+
+# Backup & temp files
+*.swp
+*.swo
+*.orig
+*.rej
+*$~
+*.tmp
+
+# Local configuration
+appsettings.*.json
+
