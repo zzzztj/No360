@@ -4,7 +4,7 @@
            UpgradeCode="{6F1AA2AA-0C0F-49F9-8B37-5E7D3A9A6F23}">
    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="x64" />
 
-    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+   <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
     <!-- Upgrade story: new major/minor version upgrades old -->
     <MajorUpgrade DowngradeErrorMessage="A newer version of no360 is already installed." />
@@ -21,6 +21,10 @@
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
     <UIRef Id="WixUI_InstallDir"/>
     <UIRef Id="WixUI_ErrorProgressText"/>
+    
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectRoot)\wix\license.rtf" />
+
+
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFiles64Folder">
