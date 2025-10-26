@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="Install Referee" Language="1033" Version="1.0.0" Manufacturer="YourName"
+           UpgradeCode="{6F1AA2AA-0C0F-49F9-8B37-5E7D3A9A6F23}">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+    <MediaTemplate />
+
+    <!-- Upgrade story: new major/minor version upgrades old -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Install Referee is already installed." />
+
+    <Feature Id="MainFeature" Title="Install Referee" Level="1" Absent="disallow">
+      <ComponentRef Id="cmpInstallRefereeExe"/>
+      <ComponentRef Id="cmpDeps"/>
+      <ComponentRef Id="cmpRuntimeConfig"/>
+      <ComponentRef Id="cmpAppSettings"/>
+      <ComponentRef Id="cmpProgramDataQuarantine"/>
+      <ComponentRef Id="cmpEventLogSource"/>
+    </Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <UIRef Id="WixUI_InstallDir"/>
+    <UIRef Id="WixUI_ErrorProgressText"/>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="InstallReferee">
+
+          <!-- Service EXE + service registration -->
+          <Component Id="cmpInstallRefereeExe" Guid="{9FD4CAAB-7406-4E2D-9A6F-3B55C67C4B73}" Win64="yes">
+            <File Id="filExe" Source="$(var.PublishDir)\InstallReferee.exe" KeyPath="yes"/>
+            <ServiceInstall Id="svcInstallReferee"
+                            Name="InstallReferee"
+                            DisplayName="Install Referee"
+                            Description="Blocks installation of disallowed software by signature/metadata."
+                            Start="auto"
+                            Type="ownProcess"
+                            ErrorControl="normal"
+                            Vital="yes" />
+            <ServiceControl Id="svcControlReferee"
+                            Name="InstallReferee"
+                            Start="install"
+                            Stop="both"
+                            Remove="uninstall"
+                            Wait="yes"/>
+          </Component>
+
+          <!-- The usual .NET publish sidecars -->
+          <Component Id="cmpDeps" Guid="{2892C76D-EE53-4B3D-9AB6-4A0C7F753D9A}" Win64="yes">
+            <File Id="filDeps" Source="$(var.PublishDir)\InstallReferee.deps.json" KeyPath="yes"/>
+          </Component>
+
+          <Component Id="cmpRuntimeConfig" Guid="{2B4F7DF8-1C9C-4DFF-9D1B-5B1DA9B3A4B1}" Win64="yes">
+            <File Id="filRuntimeConfig" Source="$(var.PublishDir)\InstallReferee.runtimeconfig.json" KeyPath="yes"/>
+          </Component>
+
+          <Component Id="cmpAppSettings" Guid="{B33B9E3A-86B9-4B24-9E3E-5E57C7A1D5B2}" Win64="yes">
+            <File Id="filAppSettings" Source="$(var.PublishDir)\appsettings.json" KeyPath="yes"/>
+          </Component>
+
+        </Directory>
+      </Directory>
+
+      <!-- ProgramData\InstallReferee\Quarantine -->
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="RefereeData" Name="InstallReferee">
+          <Directory Id="QuarantineDir" Name="Quarantine">
+            <Component Id="cmpProgramDataQuarantine" Guid="{5F3C7C13-2DF2-4B2E-B1A2-7F4A9967E9A1}" Win64="yes">
+              <CreateFolder />
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- Event Log source (lets the service write to Application log cleanly) -->
+    <Component Id="cmpEventLogSource" Guid="{A3F0E1A1-6A8F-4A12-9E30-9A2B8E4F7F11}" Directory="INSTALLFOLDER" Win64="yes">
+      <RegistryKey Root="HKLM"
+                   Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\InstallReferee">
+        <RegistryValue Type="string" Name="EventMessageFile"
+                       Value="%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\EventLogMessages.dll" KeyPath="yes"/>
+        <RegistryValue Type="integer" Name="TypesSupported" Value="7"/>
+      </RegistryKey>
+    </Component>
+
+  </Product>
+</Wix>
