@@ -120,7 +120,7 @@ try {
     -out $wixObj $wixSource
 
   # Link (UI extension gives us the simple InstallDir dialog)
-  $msiPath = Join-Path $OutputDir ("InstallReferee-$Version-x64.msi")
+  $msiPath = Join-Path $OutputDir ("no360-$Version-x64.msi")
   & $light -nologo -ext WixUIExtension -cultures:en-us `
     -out $msiPath $wixObj
 

@@ -1,15 +1,15 @@
 param(
-  [string]$ServiceName = "InstallReferee",
-  [string]$DisplayName = "Install Referee",
+  [string]$ServiceName = "no360",
+  [string]$DisplayName = "no360",
   [string]$Description = "Blocks installation of disallowed software (bundle-aware; EXE/MSI).",
-  [string]$TargetDir = "C:\Program Files\InstallReferee"
+  [string]$TargetDir = "C:\Program Files\no360"
 )
 
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
 Copy-Item -Path "$here\*" -Destination $TargetDir -Recurse -Force
 
-$exe = Join-Path $TargetDir "InstallReferee.exe"
+$exe = Join-Path $TargetDir "no360.exe"
 
 if (Get-Service -Name $ServiceName -ErrorAction SilentlyContinue) {
   sc.exe stop $ServiceName | Out-Null

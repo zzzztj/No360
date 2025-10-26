@@ -10,7 +10,7 @@ public sealed class RefereeSettings
     public RefereeSettings(IConfiguration configuration)
     {
         QuarantineDirectory = Expand(configuration["QuarantineDir"] ??
-                                     @"C:\\ProgramData\\InstallReferee\\Quarantine");
+                                     @"C:\\ProgramData\\no360\\Quarantine");
         Directory.CreateDirectory(QuarantineDirectory);
 
         WatchFolders = (configuration.GetSection("WatchFolders").Get<string[]>() ?? Array.Empty<string>())
