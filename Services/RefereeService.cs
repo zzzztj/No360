@@ -14,7 +14,7 @@ namespace No360.Services;
 
 public sealed class RefereeService : BackgroundService
 {
-    private const string EventSourceName = "InstallReferee";
+    private const string EventSourceName = "no360";
     private readonly ILogger<RefereeService> _logger;
     private readonly BlockRules _rules;
     private readonly RefereeSettings _settings;
@@ -34,7 +34,7 @@ public sealed class RefereeService : BackgroundService
         StartProcessWatcher();
         StartFolderWatchers();
         _logger.LogInformation(
-            "Install Referee started. Watching processes and {Count} folders.",
+            "no360 started. Watching processes and {Count} folders.",
             _settings.WatchFolders.Length);
         return Task.CompletedTask;
     }
