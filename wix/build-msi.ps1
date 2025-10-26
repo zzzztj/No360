@@ -21,7 +21,7 @@ try {
   }
 
   if (-not (Test-Path $PublishDir)) {
-    throw "Publish directory '$PublishDir' not found. Run 'dotnet publish -o \"$PublishDir\"' first or pass -PublishDir."
+    throw "Publish directory '$PublishDir' not found. Run 'dotnet publish -o ""$PublishDir""' first or pass -PublishDir."
   }
 
   $PublishDir = (Resolve-Path $PublishDir).Path
