@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="no360" Language="1033" Version="1.0.0" Manufacturer="Zzzztj Software"
+  <Product Id="*" Name="no360" Language="1033" Version="$(var.ProductVersion)" Manufacturer="Zzzztj Software"
            UpgradeCode="{6F1AA2AA-0C0F-49F9-8B37-5E7D3A9A6F23}">
    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="x64" />
 

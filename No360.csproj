@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>no360</AssemblyName>
     <RootNamespace>No360</RootNamespace>
+    <Version>1.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="tests/**/*.cs" />

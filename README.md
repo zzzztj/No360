@@ -1,6 +1,10 @@
 # Build Instruction
 
-dotnet publish .\No360\No360.csproj `
+Release downloads and installation: see [INSTALL.txt](INSTALL.txt).
+The v1.1.0 Windows x64 ZIP requires the .NET 8 Runtime x64 and preserves existing
+settings when upgraded with its included PowerShell installer.
+
+dotnet publish .\No360.csproj `
   -c Release -r win-x64 --self-contained true `
   -p:PublishSingleFile=true `
   -p:IncludeNativeLibrariesForSelfExtract=true `

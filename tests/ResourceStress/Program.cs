@@ -5,7 +5,9 @@ using No360.Models;
 // No test-framework dependencies. Run on Windows:
 // dotnet run --project tests/ResourceStress -c Release -- 5000
 var iterations = args.Length == 0 ? 5000 : int.Parse(args[0]);
-var directory = Path.Combine(Path.GetTempPath(), "no360-stress-" + Guid.NewGuid());
+// Keep fixtures outside watched Downloads/Temp folders so a running service
+// cannot race the exclusive-open assertions by inspecting the same MSI.
+var directory = Path.Combine(AppContext.BaseDirectory, "no360-stress-" + Guid.NewGuid());
 Directory.CreateDirectory(directory);
 var msi = Path.Combine(directory, "metadata.msi");
 var invalid = Path.Combine(directory, "invalid.msi");
