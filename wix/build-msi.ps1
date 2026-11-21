@@ -2,7 +2,7 @@ param(
   [string]$ProjectRoot,
   [string]$PublishDir,
   [string]$OutputDir,
-  [string]$Version = "1.0.0"
+  [string]$Version = "1.1.0"
 )
 
 $ErrorActionPreference = "Stop"
@@ -116,7 +116,7 @@ try {
   $wixSource = Join-Path $scriptRoot 'Product.wxs'
 
   # Compile
-  & $candle -nologo -arch x64 -dPublishDir="$PublishDir" -dProductVersion="$Version" -dWixUILicenseRtf="" `
+  & $candle -nologo -arch x64 -dProjectRoot="$ProjectRoot" -dPublishDir="$PublishDir" -dProductVersion="$Version" -dWixUILicenseRtf="" `
     -out $wixObj $wixSource
 
   # Link (UI extension gives us the simple InstallDir dialog)

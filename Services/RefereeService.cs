@@ -85,10 +85,11 @@ public sealed class RefereeService : BackgroundService
                     var metadata = MsiMeta.TryLoad(msiPath);
                     if (metadata != null && _rules.MatchesMsi(metadata))
                     {
-                        TryKill(pid);
-                        Quarantine(msiPath);
-                        LogBlock(
-                            $"Blocked MSI install '{metadata.ProductName ?? "?"}' by '{metadata.Manufacturer ?? "?"}' from {msiPath}");
+                        var killed = TryKill(pid);
+                        var quarantined = Quarantine(msiPath);
+                        if (killed || quarantined)
+                            LogBlock($"Blocked MSI install '{metadata.ProductName ?? "?"}' by '{metadata.Manufacturer ?? "?"}' from {msiPath}",
+                                $"Blocked installer: {Path.GetFileName(msiPath)}");
                         return;
                     }
                 }
@@ -97,10 +98,11 @@ public sealed class RefereeService : BackgroundService
             var fingerprint = FileFingerprint.From(processPath, processName);
             if (_rules.Matches(fingerprint))
             {
-                TryKill(pid);
-                Quarantine(processPath);
-                LogBlock(
-                    $"Blocked process '{processName}' (PID {pid}) from '{processPath}' [{fingerprint.Summary()}]");
+                var killed = TryKill(pid);
+                var quarantined = Quarantine(processPath);
+                if (killed || quarantined)
+                    LogBlock($"Blocked process '{processName}' (PID {pid}) from '{processPath}' [{fingerprint.Summary()}]",
+                        $"Blocked application: {processName}");
             }
         }
         catch (Exception exception)
@@ -152,9 +154,9 @@ public sealed class RefereeService : BackgroundService
                 var metadata = MsiMeta.TryLoad(path);
                 if (metadata != null && _rules.MatchesMsi(metadata))
                 {
-                    Quarantine(path);
-                    LogBlock(
-                        $"Quarantined MSI '{metadata.ProductName ?? "?"}' by '{metadata.Manufacturer ?? "?"}' from {path}");
+                    if (Quarantine(path))
+                        LogBlock($"Quarantined MSI '{metadata.ProductName ?? "?"}' by '{metadata.Manufacturer ?? "?"}' from {path}",
+                            $"Moved to quarantine: {Path.GetFileName(path)}");
                     return;
                 }
             }
@@ -162,8 +164,9 @@ public sealed class RefereeService : BackgroundService
             var fingerprint = FileFingerprint.From(path, Path.GetFileName(path));
             if (_rules.Matches(fingerprint))
             {
-                Quarantine(path);
-                LogBlock($"Quarantined installer '{path}' [{fingerprint.Summary()}]");
+                if (Quarantine(path))
+                    LogBlock($"Quarantined installer '{path}' [{fingerprint.Summary()}]",
+                        $"Moved to quarantine: {Path.GetFileName(path)}");
             }
         }
         catch (Exception exception)
@@ -172,13 +175,13 @@ public sealed class RefereeService : BackgroundService
         }
     }
 
-    private void Quarantine(string path)
+    private bool Quarantine(string path)
     {
         try
         {
             if (!File.Exists(path))
             {
-                return;
+                return false;
             }
 
             var destination = Path.Combine(
@@ -187,23 +190,27 @@ public sealed class RefereeService : BackgroundService
 
             Directory.CreateDirectory(_settings.QuarantineDirectory);
             File.Move(path, destination, overwrite: true);
+            return true;
         }
         catch (Exception exception)
         {
             _logger.LogWarning(exception, "Failed to quarantine {Path}", path);
+            return false;
         }
     }
 
-    private static void TryKill(int pid)
+    private static bool TryKill(int pid)
     {
         try
         {
             using var process = Process.GetProcessById(pid);
             process.Kill(entireProcessTree: true);
+            return true;
         }
         catch
         {
             // Ignore failures when terminating processes.
+            return false;
         }
     }
 
@@ -220,13 +227,14 @@ public sealed class RefereeService : BackgroundService
         }
     }
 
-    private void LogBlock(string message)
+    private void LogBlock(string message, string notification)
     {
         _logger.LogWarning(message);
 
         try
         {
-            EventLog.WriteEntry(EventSourceName, message, EventLogEntryType.Warning, 3600);
+            EventLog.WriteEntry(EventSourceName, notification + Environment.NewLine + message,
+                EventLogEntryType.Warning, 3600);
         }
         catch
         {

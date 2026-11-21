@@ -7,9 +7,11 @@
     <Nullable>enable</Nullable>
     <AssemblyName>no360</AssemblyName>
     <RootNamespace>No360</RootNamespace>
+    <Version>1.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="tests/**/*.cs" />
+    <None Update="Notifications/Notify-Blocks.ps1" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
     <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>

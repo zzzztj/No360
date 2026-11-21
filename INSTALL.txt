@@ -1,0 +1,47 @@
+no360 1.1.0 - Windows x64
+
+Requirements
+------------
+Windows 10/11 x64, Windows PowerShell 5.1, and Microsoft .NET 8 Runtime x64.
+This ZIP uses the installed .NET runtime; it is not self-contained.
+Get the runtime from https://dotnet.microsoft.com/download/dotnet/8.0
+
+Install or upgrade
+------------------
+1. Extract the ZIP to a new folder outside C:\Program Files\no360.
+2. Open Windows PowerShell as administrator in the extracted folder.
+3. Run:
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install-No360.ps1
+
+The installer backs up existing files under C:\ProgramData\no360\Backups,
+stops the service, copies the new files, preserves an existing appsettings.json,
+and restarts the service. It restores existing files if the upgrade fails.
+An existing empty configuration remains empty; configure blocking rules before
+relying on it. The supplied defaults are used only for a new configuration.
+
+For a fresh install, watched folder paths are resolved for the account running
+the installer. If you use a different administrator account, edit the installed
+appsettings.json to point at the intended user's folders, then restart no360.
+The default filename rule matches any executable/MSI name containing "360".
+
+Notifications
+-------------
+Sign out and back in to start the notification helper automatically.
+To start it now, run this from a NORMAL (not administrator) PowerShell window:
+Start-Process powershell.exe -WindowStyle Hidden -ArgumentList '-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Program Files\no360\Notifications\Notify-Blocks.ps1"'
+
+Alerts are short and silent, appear within about five seconds, and group rapid
+blocks together. Windows notification settings and Do Not Disturb still apply.
+The helper adds approximately 64 MiB of private memory at startup.
+
+Rollback
+--------
+From an administrator PowerShell window, stop no360, copy the files from the
+printed backup folder back into C:\Program Files\no360, and start no360 again.
+If rolling back to a version without notifications, disable No360Notifications
+in Windows Settings > Apps > Startup and sign out to close the existing helper.
+
+Checksums
+---------
+Compare the ZIP SHA256 with SHA256SUMS.txt on the GitHub release page:
+Get-FileHash .\no360-1.1.0-win-x64.zip -Algorithm SHA256
