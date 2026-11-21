@@ -63,10 +63,11 @@ public sealed class RefereeService : BackgroundService
 
     private void OnProcessStarted(object? sender, EventArrivedEventArgs e)
     {
+        using var processEvent = e.NewEvent;
         try
         {
-            var pid = Convert.ToInt32(e.NewEvent["ProcessID"]);
-            var processName = Convert.ToString(e.NewEvent["ProcessName"]) ?? string.Empty;
+            var pid = Convert.ToInt32(processEvent["ProcessID"]);
+            var processName = Convert.ToString(processEvent["ProcessName"]) ?? string.Empty;
             var processPath = ProcessPath(pid);
 
             if (string.IsNullOrEmpty(processPath))
@@ -239,9 +240,13 @@ public sealed class RefereeService : BackgroundService
         {
             using var searcher = new ManagementObjectSearcher(
                 "SELECT CommandLine FROM Win32_Process WHERE ProcessId=" + pid);
-            foreach (ManagementObject instance in searcher.Get())
+            using var results = searcher.Get();
+            foreach (ManagementObject instance in results)
             {
-                return instance["CommandLine"]?.ToString();
+                using (instance)
+                {
+                    return instance["CommandLine"]?.ToString();
+                }
             }
         }
         catch
