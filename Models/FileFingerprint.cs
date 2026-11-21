@@ -42,8 +42,8 @@ public sealed class FileFingerprint
 
         try
         {
-            var certificate = X509Certificate.CreateFromSignedFile(path);
-            var certificate2 = new X509Certificate2(certificate);
+            using var certificate = X509Certificate.CreateFromSignedFile(path);
+            using var certificate2 = new X509Certificate2(certificate);
             fingerprint.SignerSubject = certificate2.Subject;
             fingerprint.SignerIssuer = certificate2.Issuer;
         }

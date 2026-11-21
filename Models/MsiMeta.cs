@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace No360.Models;
 
@@ -10,6 +11,9 @@ public sealed class MsiMeta
 
     public static MsiMeta? TryLoad(string msiPath)
     {
+        dynamic? installer = null;
+        dynamic? database = null;
+        dynamic? view = null;
         try
         {
             var type = Type.GetTypeFromProgID("WindowsInstaller.Installer");
@@ -18,11 +22,11 @@ public sealed class MsiMeta
                 return null;
             }
 
-            dynamic installer = Activator.CreateInstance(type)!;
-            dynamic database = installer.OpenDatabase(msiPath, 0);
+            installer = Activator.CreateInstance(type)!;
+            database = installer.OpenDatabase(msiPath, 0);
             const string query =
-                "SELECT `Property`,`Value` FROM `Property` WHERE `Property` IN ('Manufacturer','ProductName')";
-            dynamic view = database.OpenView(query);
+                "SELECT `Property`,`Value` FROM `Property` WHERE `Property` = 'Manufacturer' OR `Property` = 'ProductName'";
+            view = database.OpenView(query);
             view.Execute(null);
 
             string? manufacturer = null;
@@ -35,15 +39,22 @@ public sealed class MsiMeta
                     break;
                 }
 
-                string property = record.StringData(1);
-                string value = record.StringData(2);
-                if (property == "Manufacturer")
+                try
                 {
-                    manufacturer = value;
+                    string property = record.StringData(1);
+                    string value = record.StringData(2);
+                    if (property == "Manufacturer")
+                    {
+                        manufacturer = value;
+                    }
+                    else if (property == "ProductName")
+                    {
+                        product = value;
+                    }
                 }
-                else if (property == "ProductName")
+                finally
                 {
-                    product = value;
+                    ReleaseComObject(record);
                 }
             }
 
@@ -56,6 +67,33 @@ public sealed class MsiMeta
         catch
         {
             return null;
+        }
+        finally
+        {
+            try
+            {
+                view?.Close();
+            }
+            catch
+            {
+                // A partially initialized view may not be open yet.
+            }
+            finally
+            {
+                // These COM objects are local to this inspection. Release them
+                // in reverse order, even when opening or querying the MSI fails.
+                ReleaseComObject(view);
+                ReleaseComObject(database);
+                ReleaseComObject(installer);
+            }
+        }
+    }
+
+    private static void ReleaseComObject(object? value)
+    {
+        if (value != null && Marshal.IsComObject(value))
+        {
+            Marshal.ReleaseComObject(value);
         }
     }
 }
