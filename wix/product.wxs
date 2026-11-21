@@ -16,6 +16,7 @@
       <ComponentRef Id="cmpAppSettings"/>
       <ComponentRef Id="cmpProgramDataQuarantine"/>
       <ComponentRef Id="cmpEventLogSource"/>
+      <ComponentRef Id="cmpNotifications"/>
     </Feature>
 
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
@@ -61,6 +62,15 @@
           <Component Id="cmpAppSettings" Guid="{B33B9E3A-86B9-4B24-9E3E-5E57C7A1D5B2}" Win64="yes">
             <File Id="filAppSettings" Source="$(var.PublishDir)\appsettings.json" KeyPath="yes"/>
           </Component>
+
+          <Directory Id="NotificationsFolder" Name="Notifications">
+            <Component Id="cmpNotifications" Guid="{AB913171-D88F-46D1-AD34-363664519617}" Win64="yes">
+              <File Id="filNotifications" Source="$(var.PublishDir)\Notifications\Notify-Blocks.ps1" KeyPath="yes"/>
+              <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                             Name="No360Notifications" Type="string"
+                             Value="&quot;[System64Folder]WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File &quot;[#filNotifications]&quot;"/>
+            </Component>
+          </Directory>
 
         </Directory>
       </Directory>

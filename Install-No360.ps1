@@ -19,4 +19,10 @@ if (Get-Service -Name $ServiceName -ErrorAction SilentlyContinue) {
 sc.exe create $ServiceName binPath= "`"$exe`"" start= auto DisplayName= "`"$DisplayName`"" | Out-Null
 sc.exe description $ServiceName "$Description" | Out-Null
 Start-Service $ServiceName
+$notificationScript = Join-Path $TargetDir 'Notifications\Notify-Blocks.ps1'
+if (Test-Path -LiteralPath $notificationScript) {
+  $powershell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+  $command = '"' + $powershell + '" -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $notificationScript + '"'
+  New-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'No360Notifications' -Value $command -PropertyType String -Force | Out-Null
+}
 Write-Host "Service '$ServiceName' installed and started."
